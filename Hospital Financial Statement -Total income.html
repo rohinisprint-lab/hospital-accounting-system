@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)http://localhost:8000/reports/financial -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="RXE9TaLkpWgrBKLsGZndMFjUsCU6Dll7BKmXMqMf">
+
+    <title>Hospital Management</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.bunny.net/">
+    <link href="./Hospital Financial Statement -Total income_files/css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Navigation Header */
+        .top-navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 4.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: #0f172a;
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            padding: 0.5rem 0.15rem;
+            position: relative;
+            transition: color 0.15s ease;
+        }
+
+        .nav-link:hover {
+            color: #4f46e5;
+        }
+
+        .nav-link.active {
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.35rem;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background-color: #4f46e5;
+            border-radius: 9999px;
+        }
+
+        /* User Profile & Actions */
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-details {
+            text-align: right;
+            line-height: 1.25;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: block;
+        }
+
+        .role-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #4f46e5;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            background-color: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+
+        /* Main Content Container */
+        .main-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3.5rem;
+        }
+
+        /* Alert notifications */
+        .alert {
+            padding: 0.875rem 1.25rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="top-navbar">
+        <div class="nav-container">
+            
+            <!-- Logo & Brand -->
+            <a href="http://localhost:8000/dashboard" class="brand-section">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                </svg>
+                <div class="brand-title">
+                    Hospital<br><span style="font-weight: 500; font-size: 0.95rem; color: #475569;">Management</span>
+                </div>
+            </a>
+
+            <!-- Central Navigation Links -->
+            <nav class="nav-links">
+                <a href="http://localhost:8000/dashboard" class="nav-link ">
+                    Dashboard
+                </a>
+                <a href="http://localhost:8000/expenses" class="nav-link ">
+                    Expenses
+                </a>
+                <a href="http://localhost:8000/incomes" class="nav-link ">
+                    Incomes
+                </a>
+                <a href="http://localhost:8000/reports/financial" class="nav-link active">
+                    Financial Statement
+                </a>
+
+                
+                                    <a href="http://localhost:8000/cost-centers" class="nav-link ">
+                        Cost Centers
+                    </a>
+                    <a href="http://localhost:8000/branches" class="nav-link ">
+                        Branches
+                    </a>
+                    <a href="http://localhost:8000/staff" class="nav-link ">
+                        Staff
+                    </a>
+                            </nav>
+
+            <!-- User Info & Logout Button -->
+            <div class="user-section">
+                                    <div class="user-details">
+                        <span class="user-name">Rohini (Admin)</span>
+                        <span class="role-badge">(ADMIN)</span>
+                    </div>
+
+                    <form method="POST" action="http://localhost:8000/logout" style="margin: 0;">
+                        <input type="hidden" name="_token" value="RXE9TaLkpWgrBKLsGZndMFjUsCU6Dll7BKmXMqMf" autocomplete="off">                        <button type="submit" class="logout-btn">
+                            Log Out
+                        </button>
+                    </form>
+                            </div>
+
+        </div>
+    </header>
+
+    <!-- Main View Page Body -->
+    <main class="main-wrapper">
+        <!-- Success Alert -->
+        
+        <!-- Error Alert -->
+        
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+    <!-- Page Header & CSV Export -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: #111827; margin: 0;">Hospital Financial Statement</h1>
+            <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Executive revenue, operational disbursements, and audit trails.</p>
+        </div>
+        <div>
+            <a href="http://localhost:8000/reports/financial/export" style="background-color: #047857; color: #ffffff !important; text-decoration: none; padding: 0.6rem 1.25rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                📥 Export CSV Audit File
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Form Bar -->
+    <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <form method="GET" action="http://localhost:8000/reports/financial" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+                
+                <!-- From Date -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.375rem; text-transform: uppercase;">From Date</label>
+                    <input type="date" name="start_date" value="2026-10-01" style="width: 100%; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; box-sizing: border-box;">
+                </div>
+
+                <!-- To Date -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.375rem; text-transform: uppercase;">To Date</label>
+                    <input type="date" name="end_date" value="2026-10-31" style="width: 100%; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; box-sizing: border-box;">
+                </div>
+
+                <!-- Branch Dropdown -->
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.375rem; text-transform: uppercase;">Branch</label>
+                    <select name="branch_id" style="width: 100%; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; box-sizing: border-box; background: #ffffff;">
+                        <option value="">All Hospital Branches</option>
+                                                    <option value="1">
+                                Main Hospital Campus
+                            </option>
+                                                    <option value="2">
+                                City Diagnostic &amp; Special Wing
+                            </option>
+                                                    <option value="3">
+                                South Regional Specialty Clinic
+                            </option>
+                                            </select>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <button type="submit" style="background-color: #4f46e5; color: #ffffff; border: none; padding: 0.55rem 1.5rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer;">
+                    Generate Report
+                </button>
+                <a href="http://localhost:8000/reports/financial" style="background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 0.55rem 1.25rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600;">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Executive Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+        
+        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <span style="font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em;">Total Period Income</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #059669; margin-top: 0.5rem;">
+                ₹2,350.00
+            </div>
+        </div>
+
+        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <span style="font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em;">Total Period Expenses</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #dc2626; margin-top: 0.5rem;">
+                ₹620.00
+            </div>
+        </div>
+
+        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <span style="font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em;">Period Net Cash Flow</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #2563eb; margin-top: 0.5rem;">
+                ₹1,730.00
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Breakdown Tables Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Income Head Breakdown -->
+        <div style="background: #ffffff; border-radius: 0.75rem; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Income Collections by Head</h3>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+                <thead>
+                    <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb; color: #4b5563; font-size: 0.75rem; text-transform: uppercase;">
+                        <th style="padding: 0.75rem 1rem;">Category / Head</th>
+                        <th style="padding: 0.75rem 1rem; text-align: right;">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                            <td style="padding: 0.75rem 1rem; color: #374151; font-weight: 600;">
+                                Consultation  &amp; OPD Fees
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: #059669;">
+                                ₹350.00
+                            </td>
+                        </tr>
+                                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                            <td style="padding: 0.75rem 1rem; color: #374151; font-weight: 600;">
+                                IPD &amp; Bed Charges
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: #059669;">
+                                ₹2,000.00
+                            </td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+
+        <!-- Expense Head Breakdown -->
+        <div style="background: #ffffff; border-radius: 0.75rem; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Disbursements by Cost Center</h3>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+                <thead>
+                    <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb; color: #4b5563; font-size: 0.75rem; text-transform: uppercase;">
+                        <th style="padding: 0.75rem 1rem;">Cost Center</th>
+                        <th style="padding: 0.75rem 1rem; text-align: right;">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                            <td style="padding: 0.75rem 1rem; color: #374151; font-weight: 600;">
+                                utilities
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: #dc2626;">
+                                ₹620.00
+                            </td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+    </main>
+
+
+</body></html>
