@@ -4,58 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Expense;
-use App\Models\ExpenseHead;
 use App\Models\Income;
 use App\Models\IncomeHead;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Total Metrics
-        $totalIncome = Income::sum('amount');
-        $totalExpense = Expense::sum('amount');
-        $netSurplus = $totalIncome - $totalExpense;
+        $selectedBranchId = $request->get('branch_id');
 
-        // 2. Today's Metrics
-        $today = Carbon::today()->toDateString();
-        $todayIncome = Income::whereDate('entry_date', $today)->sum('amount');
-        $todayExpense = Expense::whereDate('entry_date', $today)->sum('amount');
+        // Query builders with optional branch filtering
+        $incomesQuery = Income::query();
+        $expensesQuery = Expense::query();
 
-        // 3. Category Breakdown (Top Cost Centers & Incomes)
-        $topIncomeHeads = IncomeHead::withSum('incomes', 'amount')
-            ->orderByDesc('incomes_sum_amount')
-            ->take(4)
+        if ($selectedBranchId) {
+            $incomesQuery->where('branch_id', $selectedBranchId);
+            $expensesQuery->where('branch_id', $selectedBranchId);
+        }
+
+        // Summary Metric Cards
+        $totalIncome = (float) $incomesQuery->sum('amount');
+        $totalExpense = (float) $expensesQuery->sum('amount');
+        $netBalance = $totalIncome - $totalExpense;
+
+        // Recent Activity Lists using safe relationships
+        $recentIncomes = (clone $incomesQuery)
+            ->with(['branch'])
+            ->limit(5)
             ->get();
 
-        $topExpenseHeads = ExpenseHead::withSum('expenses', 'amount')
-            ->orderByDesc('expenses_sum_amount')
-            ->take(4)
+        $recentExpenses = (clone $expensesQuery)
+            ->with(['branch'])
+            ->limit(5)
             ->get();
 
-       // 4. Recent Activities (with audit creator)
-$recentIncomes = Income::with(['incomeHead', 'creator'])
-    ->latest('entry_date')
-    ->take(5)
-    ->get();
+        // Income category breakdown for the chart
+        $heads = IncomeHead::withSum('incomes', 'amount')->get();
+        $chartLabels = $heads->pluck('name')->toArray();
+        $chartValues = $heads->map(fn($h) => (float) ($h->incomes_sum_amount ?? 0))->toArray();
 
-$recentExpenses = Expense::with(['expenseHead', 'creator'])
-    ->latest('entry_date')
-    ->take(5)
-    ->get();
-
+        // Dropdown filter options
+       $branches = Branch::all();
         return view('dashboard', compact(
             'totalIncome',
             'totalExpense',
-            'netSurplus',
-            'todayIncome',
-            'todayExpense',
-            'topIncomeHeads',
-            'topExpenseHeads',
+            'netBalance',
             'recentIncomes',
-            'recentExpenses'
+            'recentExpenses',
+            'chartLabels',
+            'chartValues',
+            'branches',
+            'selectedBranchId'
         ));
     }
 }

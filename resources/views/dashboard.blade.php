@@ -1,155 +1,166 @@
 @extends('layouts.app')
 
 @section('content')
-<div style="display: flex; flex-direction: column; gap: 1.75rem;">
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-6">
 
-    <!-- Top Greeting & Branch Overview -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <!-- Header & Campus Filter -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
-            <h1 style="font-size: 1.625rem; font-weight: 800; color: #111827; margin: 0;">Financial Dashboard</h1>
-            <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Real-time overview of collections, expenditures, and net surplus.</p>
+            <h1 class="text-2xl font-bold text-slate-800">Financial Dashboard</h1>
+            <p class="text-sm text-slate-500 mt-1">Real-time consolidated income, expenditures, and branch collections.</p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
-            @if(in_array(Auth::user()->role ?? '', ['admin', 'receptionist']))
-                <a href="{{ route('incomes.create') }}" style="background-color: #059669; color: #ffffff !important; text-decoration: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.8125rem; font-weight: 700;">
-                    + New Receipt
-                </a>
+
+        <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
+            <select name="branch_id" onchange="this.form.submit()" class="rounded-lg border-slate-300 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                <option value="">All Campuses / Branches</option>
+                @foreach($branches as $branch)
+                    <option value="{{ $branch->branch_id ?? $branch->id }}" {{ (string)$selectedBranchId === (string)($branch->branch_id ?? $branch->id) ? 'selected' : '' }}>
+                        {{ $branch->branch_name ?? $branch->name }}
+                    </option>
+                @endforeach
+            </select>
+            @if($selectedBranchId)
+                <a href="{{ route('dashboard') }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline">Clear</a>
             @endif
-            @if(in_array(Auth::user()->role ?? '', ['admin', 'accountant']))
-                <a href="{{ route('expenses.create') }}" style="background-color: #dc2626; color: #ffffff !important; text-decoration: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.8125rem; font-weight: 700;">
-                    + New Expense
-                </a>
-            @endif
+        </form>
+    </div>
+
+    <!-- 3 Key Metric Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Inflow -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Income</p>
+            <p class="text-3xl font-extrabold text-emerald-600 mt-2">₹{{ number_format($totalIncome, 2) }}</p>
+            <span class="inline-block mt-3 text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">Inflows recorded</span>
+        </div>
+
+        <!-- Total Outflow -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Expenses</p>
+            <p class="text-3xl font-extrabold text-rose-600 mt-2">₹{{ number_format($totalExpense, 2) }}</p>
+            <span class="inline-block mt-3 text-xs text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full font-medium">Outflows disbursed</span>
+        </div>
+
+        <!-- Net Surplus / Balance -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Net Operating Balance</p>
+            <p class="text-3xl font-extrabold {{ $netBalance >= 0 ? 'text-indigo-600' : 'text-rose-600' }} mt-2">
+                ₹{{ number_format($netBalance, 2) }}
+            </p>
+            <span class="inline-block mt-3 text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full font-medium">Current cash surplus</span>
         </div>
     </div>
 
-    <!-- 3 Big Metric Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-        
-    @php
-    // Match the exact variable names used in your metric cards:
-    // (e.g. $totalIncome / $totalExpense or $totalCollections / $totalDisbursements)
-    $inflow = (float) ($totalCollections ?? $totalIncome ?? 870);
-    $outflow = (float) ($totalDisbursements ?? $totalExpense ?? 1220);
-    $totalFlow = $inflow + $outflow;
+    <!-- Chart & Recent Activity Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    $inflowPct = $totalFlow > 0 ? round(($inflow / $totalFlow) * 100) : 50;
-    $outflowPct = 100 - $inflowPct;
-@endphp
-   
-
-<div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; margin-top: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-    <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
-        <span style="color: #059669;">Collections Ratio ({{ $inflowPct }}%)</span>
-        <span style="color: #dc2626;">Disbursements Ratio ({{ $outflowPct }}%)</span>
-    </div>
-    <div style="height: 10px; width: 100%; background: #fee2e2; border-radius: 9999px; overflow: hidden; display: flex;">
-        <div style="width: {{ $inflowPct }}%; background: #10b981; height: 100%;"></div>
-        <div style="width: {{ $outflowPct }}%; background: #ef4444; height: 100%;"></div>
-    </div>
-</div>
-        <!-- Total Incomes -->
-        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8125rem; font-weight: 700; color: #6b7280; text-transform: uppercase;">Total Collections</span>
-                <span style="background: #ecfdf5; color: #059669; padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;">Inflow</span>
+        <!-- Visual Analytics Chart (Fixed Box Size) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-1 flex flex-col justify-between">
+            <div>
+                <h2 class="text-base font-bold text-slate-800">Collections by Category</h2>
+                <p class="text-xs text-slate-500 mb-4">Distribution across hospital cost centers.</p>
             </div>
-            <div style="font-size: 1.875rem; font-weight: 800; color: #059669; margin-top: 0.75rem;">
-                ₹{{ number_format($totalIncome, 2) }}
-            </div>
-            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
-                Today's Receipt: <strong style="color: #374151;">₹{{ number_format($todayIncome, 2) }}</strong>
+            
+            <div class="relative w-full flex items-center justify-center" style="height: 240px; max-width: 100%;">
+                <canvas id="incomeDonutChart"></canvas>
             </div>
         </div>
 
-        <!-- Total Expenses -->
-        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8125rem; font-weight: 700; color: #6b7280; text-transform: uppercase;">Total Disbursements</span>
-                <span style="background: #fef2f2; color: #dc2626; padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;">Outflow</span>
+        <!-- Recent Income Ledger Snippet -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-bold text-slate-800">Recent Inflow Transactions</h2>
+                <a href="{{ route('incomes.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View All Incomes &rarr;</a>
             </div>
-            <div style="font-size: 1.875rem; font-weight: 800; color: #dc2626; margin-top: 0.75rem;">
-                ₹{{ number_format($totalExpense, 2) }}
-            </div>
-            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
-                Today's Payouts: <strong style="color: #374151;">₹{{ number_format($todayExpense, 2) }}</strong>
-            </div>
-        </div>
 
-        <!-- Net Surplus -->
-        <div style="background: #ffffff; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8125rem; font-weight: 700; color: #6b7280; text-transform: uppercase;">Net Cash Position</span>
-                <span style="background: {{ $netSurplus >= 0 ? '#eff6ff' : '#fff1f2' }}; color: {{ $netSurplus >= 0 ? '#2563eb' : '#e11d48' }}; padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;">
-                    {{ $netSurplus >= 0 ? 'Surplus' : 'Deficit' }}
-                </span>
-            </div>
-            <div style="font-size: 1.875rem; font-weight: 800; color: {{ $netSurplus >= 0 ? '#111827' : '#e11d48' }}; margin-top: 0.75rem;">
-                ₹{{ number_format($netSurplus, 2) }}
-            </div>
-            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
-                Net Balance across all cost centers
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Recent Feeds Grid: Recent Receipts vs Recent Expenses -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Recent Receipts -->
-        <div style="background: #ffffff; border-radius: 0.75rem; border: 1px solid #e5e7eb; padding: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1rem; font-weight: 800; color: #111827; margin: 0;">Recent Receipts</h3>
-                <a href="{{ route('incomes.index') }}" style="font-size: 0.75rem; font-weight: 700; color: #2563eb; text-decoration: none;">View All &rarr;</a>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                @forelse($recentIncomes as $rec)
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 0.875rem; color: #111827;">{{ $rec->received_from ?? $rec->payer_name ?? 'Walk-in Patient' }}</div>
-                            <div style="font-size: 0.75rem; color: #6b7280;">
-                                {{ $rec->incomeHead->head_name ?? 'Receipt' }} &bull; Billed by: {{ $rec->creator->name ?? 'Admin' }}
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 800; font-size: 0.875rem; color: #059669;">+₹{{ number_format($rec->amount, 2) }}</div>
-                            <div style="font-size: 0.6875rem; color: #9ca3af;">{{ \Carbon\Carbon::parse($rec->entry_date)->format('d M') }}</div>
-                        </div>
-                    </div>
-                @empty
-                    <div style="font-size: 0.8125rem; color: #9ca3af; text-align: center; padding: 1rem 0;">No receipts recorded yet.</div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Recent Expenses -->
-        <div style="background: #ffffff; border-radius: 0.75rem; border: 1px solid #e5e7eb; padding: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1rem; font-weight: 800; color: #111827; margin: 0;">Recent Expenses</h3>
-                <a href="{{ route('expenses.index') }}" style="font-size: 0.75rem; font-weight: 700; color: #dc2626; text-decoration: none;">View All &rarr;</a>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                @forelse($recentExpenses as $exp)
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 0.875rem; color: #111827;">{{ $exp->paid_to }}</div>
-                            <div style="font-size: 0.75rem; color: #6b7280;">
-                                {{ $exp->expenseHead->head_name ?? 'Expense' }} &bull; Auth by: {{ $exp->creator->name ?? 'Admin' }}
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 800; font-size: 0.875rem; color: #dc2626;">-₹{{ number_format($exp->amount, 2) }}</div>
-                            <div style="font-size: 0.6875rem; color: #9ca3af;">{{ \Carbon\Carbon::parse($exp->entry_date)->format('d M') }}</div>
-                        </div>
-                    </div>
-                @empty
-                    <div style="font-size: 0.8125rem; color: #9ca3af; text-align: center; padding: 1rem 0;">No expense entries recorded yet.</div>
-                @endforelse
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <th class="py-2">Receipt #</th>
+                            <th class="py-2">Cost Center</th>
+                            <th class="py-2">Staff</th>
+                            <th class="py-2 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($recentIncomes as $inc)
+                            <tr>
+                                <td class="py-2.5 font-medium text-slate-800">
+                                    {{ $inc->receipt_number ?? '#REC-'.($inc->income_id ?? $inc->id) }}
+                                </td>
+                                <td class="py-2.5 text-slate-600">
+                                    {{ $inc->costCenter->name ?? $inc->incomeHead->name ?? 'General' }}
+                                </td>
+                                <td class="py-2.5 text-slate-500 text-xs">
+                                    {{ $inc->creator->name ?? 'System' }}
+                                </td>
+                                <td class="py-2.5 text-right font-bold text-emerald-600">
+                                    +₹{{ number_format($inc->amount, 2) }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-4 text-center text-slate-400 text-xs">No recent income transactions recorded.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
     </div>
 
 </div>
+
+<!-- Chart.js CDN & Config -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('incomeDonutChart');
+        if (!ctx) return;
+
+        const labels = @json($chartLabels);
+        const data = @json($chartValues);
+
+        if (labels.length === 0 || data.length === 0) {
+            ctx.parentElement.innerHTML = '<p class="text-slate-400 text-xs text-center py-12">No collection data to visualize yet.</p>';
+            return;
+        }
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#4f46e5', // Indigo
+                        '#06b6d4', // Cyan
+                        '#10b981', // Emerald
+                        '#f59e0b', // Amber
+                        '#ec4899', // Pink
+                        '#8b5cf6'  // Purple
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            padding: 10,
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 @endsection
